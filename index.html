@@ -611,5 +611,106 @@ function prepareStoryCharacters() {
     names.length + "টি চরিত্র প্রস্তুত। প্রতিটি নামের বাটনে চাপ দিয়ে Character Creator-এ পাঠাও।";
 }
       </script>
+  <section id="characterImageManager" style="background:#1d2239;color:white;padding:18px;border-radius:14px;margin:20px auto;max-width:760px;font-family:Arial,sans-serif;">
+  <h2 style="color:#c4c0ff;">🖼️ Character Image Manager</h2>
+  <p>চরিত্র নির্বাচন করে তার আসল ছবি যোগ করো।</p>
+
+  <label for="managerCharacter">চরিত্র নির্বাচন করো</label>
+  <select id="managerCharacter" style="display:block;width:100%;padding:12px;margin:8px 0;">
+    <option value="রাজকুমারী মায়া">রাজকুমারী মায়া</option>
+    <option value="পরী লুনা">পরী লুনা</option>
+    <option value="রাজা">রাজা</option>
+  </select>
+
+  <label for="managerImage">ফোন থেকে ছবি বেছে নাও</label>
+  <input id="managerImage" type="file" accept="image/*"
+    style="display:block;width:100%;padding:12px;margin:8px 0;">
+
+  <button type="button" onclick="saveManagerImage()"
+    style="width:100%;padding:13px;background:#7775ff;color:white;border:0;border-radius:8px;font-weight:bold;">
+    💾 চরিত্রের ছবি সংরক্ষণ
+  </button>
+
+  <p id="managerStatus"></p>
+  <div id="managerGallery"></div>
+</section>
+
+<script>
+function saveManagerImage() {
+  const file = document.getElementById("managerImage").files[0];
+  const name = document.getElementById("managerCharacter").value;
+  const status = document.getElementById("managerStatus");
+
+  if (!file) {
+    status.textContent = "আগে ফোন থেকে একটি ছবি বেছে নাও।";
+    return;
+  }
+
+  if (!file.type.startsWith("image/")) {
+    status.textContent = "অনুগ্রহ করে ছবির ফাইল বেছে নাও।";
+    return;
+  }
+
+  if (file.size > 2 * 1024 * 1024) {
+    status.textContent = "ছবিটি 2 MB-এর চেয়ে বড়। ছোট ছবি বেছে নাও।";
+    return;
+  }
+
+  const reader = new FileReader();
+
+  reader.onload = function() {
+    try {
+      const key = "aiAnimationStudioManagerImages";
+      const images = JSON.parse(localStorage.getItem(key) || "{}");
+      images[name] = reader.result;
+      localStorage.setItem(key, JSON.stringify(images));
+      document.getElementById("managerImage").value = "";
+      status.textContent = name + "–এর ছবি সংরক্ষণ হয়েছে!";
+      renderManagerGallery();
+    } catch (error) {
+      status.textContent = "সংরক্ষণ করা যায়নি। ব্রাউজারের জায়গা খালি আছে কি না দেখো।";
+    }
+  };
+
+  reader.onerror = function() {
+    status.textContent = "ছবিটি পড়া যায়নি। আবার চেষ্টা করো।";
+  };
+
+  reader.readAsDataURL(file);
+}
+
+function renderManagerGallery() {
+  const gallery = document.getElementById("managerGallery");
+  gallery.replaceChildren();
+
+  let images = {};
+  try {
+    images = JSON.parse(
+      localStorage.getItem("aiAnimationStudioManagerImages") || "{}"
+    );
+  } catch {}
+
+  Object.entries(images).forEach(function(entry) {
+    const name = entry[0];
+    const src = entry[1];
+
+    const card = document.createElement("div");
+    card.style.cssText = "background:#101629;padding:12px;margin:12px 0;border-radius:10px;";
+
+    const title = document.createElement("h3");
+    title.textContent = name;
+
+    const image = document.createElement("img");
+    image.src = src;
+    image.alt = name;
+    image.style.cssText = "width:100%;max-width:300px;border-radius:10px;display:block;";
+
+    card.append(title, image);
+    gallery.append(card);
+  });
+}
+
+renderManagerGallery();
+</script>
 </body>
 </html>

@@ -215,5 +215,139 @@ async function generateImage() {
   }
 }
 </script>
+  
+<section id="characterCreator" style="background:#1d2239;color:white;padding:20px;border-radius:14px;margin:20px auto;max-width:760px;font-family:Arial,sans-serif;">
+  <h2 style="color:#c4c0ff;">🧚 Character Creator</h2>
+  <p>তোমার গল্পের চরিত্র তৈরি করো এবং তাদের তথ্য সংরক্ষণ করো।</p>
+
+  <label for="charName">চরিত্রের নাম</label>
+  <input id="charName" placeholder="যেমন: রাজকুমারী মায়া" style="display:block;width:100%;padding:12px;margin:8px 0;box-sizing:border-box;">
+
+  <label for="charType">চরিত্রের ধরন</label>
+  <select id="charType" style="display:block;width:100%;padding:12px;margin:8px 0;box-sizing:border-box;">
+    <option>রাজকুমারী</option>
+    <option>রাজা</option>
+    <option>রানি</option>
+    <option>পরী</option>
+    <option>রাজপুত্র</option>
+    <option>দানব</option>
+    <option>প্রাণী</option>
+    <option>অন্যান্য</option>
+  </select>
+
+  <label for="charStyle">অ্যানিমেশন স্টাইল</label>
+  <select id="charStyle" style="display:block;width:100%;padding:12px;margin:8px 0;box-sizing:border-box;">
+    <option>3D Cartoon Animation</option>
+    <option>2D Cartoon Animation</option>
+    <option>Storybook Illustration</option>
+  </select>
+
+  <label for="charDescription">চরিত্রের চেহারা ও পোশাক</label>
+  <textarea id="charDescription" rows="4" placeholder="যেমন: লম্বা কালো চুল, নীল চোখ, গোলাপি রাজকীয় পোশাক..." style="display:block;width:100%;padding:12px;margin:8px 0;box-sizing:border-box;"></textarea>
+
+  <button type="button" onclick="saveCharacter()" style="width:100%;padding:13px;background:#7775ff;color:white;border:0;border-radius:8px;font-weight:bold;margin:8px 0;">💾 চরিত্র সংরক্ষণ</button>
+
+  <button type="button" onclick="makeCharacterPrompt()" style="width:100%;padding:13px;background:#268b76;color:white;border:0;border-radius:8px;font-weight:bold;margin:8px 0;">🎨 ছবির Prompt তৈরি</button>
+
+  <textarea id="characterPrompt" rows="5" readonly placeholder="এখানে চরিত্রের ছবির Prompt তৈরি হবে..." style="display:block;width:100%;padding:12px;margin:8px 0;box-sizing:border-box;"></textarea>
+
+  <h3>📚 সংরক্ষিত চরিত্র</h3>
+  <div id="characterList"></div>
+  <p style="font-size:13px;color:#d0d0e0;">চরিত্রগুলো এই ব্রাউজারের Local Storage-এ থাকবে। ব্রাউজারের ডেটা মুছে ফেললে সেগুলো হারাতে পারে।</p>
+</section>
+
+<script>
+const characterStorageKey = "aiAnimationStudioCharacters";
+
+function getCharacters() {
+  try {
+    return JSON.parse(localStorage.getItem(characterStorageKey) || "[]");
+  } catch {
+    return [];
+  }
+}
+
+function saveCharacter() {
+  const name = document.getElementById("charName").value.trim();
+  const type = document.getElementById("charType").value;
+  const style = document.getElementById("charStyle").value;
+  const description = document.getElementById("charDescription").value.trim();
+
+  if (!name || !description) {
+    alert("চরিত্রের নাম এবং চেহারার বর্ণনা লিখুন।");
+    return;
+  }
+
+  const characters = getCharacters();
+  characters.push({
+    id: Date.now(),
+    name, type, style, description
+  });
+
+  try {
+    localStorage.setItem(characterStorageKey, JSON.stringify(characters));
+    renderCharacters();
+    alert("চরিত্র সংরক্ষণ হয়েছে!");
+  } catch {
+    alert("সংরক্ষণ করা যায়নি। ব্রাউজারের স্টোরেজ পরীক্ষা করুন।");
+  }
+}
+
+function makeCharacterPrompt() {
+  const name = document.getElementById("charName").value.trim();
+  const type = document.getElementById("charType").value;
+  const style = document.getElementById("charStyle").value;
+  const description = document.getElementById("charDescription").value.trim();
+
+  if (!name || !description) {
+    alert("আগে নাম ও চেহারার বর্ণনা লিখুন।");
+    return;
+  }
+
+  document.getElementById("characterPrompt").value =
+    "Create a character reference image for an animated story.\n" +
+    "Character name: " + name + "\n" +
+    "Character type: " + type + "\n" +
+    "Style: " + style + "\n" +
+    "Appearance: " + description + "\n" +
+    "Show the full character clearly, with consistent facial features, hairstyle, clothing and colors. Plain background, high quality, family-friendly.";
+}
+
+function renderCharacters() {
+  const list = document.getElementById("characterList");
+  list.replaceChildren();
+
+  getCharacters().forEach(character => {
+    const card = document.createElement("div");
+    card.style.cssText = "background:#101629;padding:12px;margin:10px 0;border-radius:8px;";
+
+    const title = document.createElement("strong");
+    title.textContent = character.name + " — " + character.type;
+
+    const details = document.createElement("p");
+    details.textContent = character.style + " | " + character.description;
+
+    const remove = document.createElement("button");
+    remove.type = "button";
+    remove.textContent = "🗑️ এই চরিত্র মুছুন";
+    remove.onclick = function() {
+      if (!confirm("এই চরিত্রটি মুছতে চান?")) return;
+      const remaining = getCharacters().filter(item => item.id !== character.id);
+      localStorage.setItem(characterStorageKey, JSON.stringify(remaining));
+      renderCharacters();
+    };
+
+    card.append(title, details, remove);
+    list.appendChild(card);
+  });
+
+  if (!list.children.length) {
+    list.textContent = "এখনো কোনো চরিত্র সংরক্ষণ করা হয়নি।";
+  }
+}
+
+renderCharacters();
+</script>
+
 </body>
 </html>

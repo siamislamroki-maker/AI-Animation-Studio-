@@ -935,5 +935,94 @@ function renderSceneLibrary() {
 
 renderSceneLibrary();
     </script>
+  <section id="referencePromptHelper" style="background:#1d2239;color:white;padding:18px;border-radius:14px;margin:20px auto;max-width:760px;font-family:Arial,sans-serif;">
+  <h2 style="color:#c4c0ff;">🎨 Character Reference Prompt Helper</h2>
+  <p>চরিত্রের মূল ছবি দেখে তার চেহারার বর্ণনা লিখে নতুন দৃশ্যের প্রম্পট তৈরি করো।</p>
+
+  <label for="refCharacter">চরিত্র নির্বাচন করো</label>
+  <select id="refCharacter" style="display:block;width:100%;padding:12px;margin:8px 0;">
+    <option value="Maya">রাজকুমারী মায়া</option>
+    <option value="Luna">পরী লুনা</option>
+    <option value="King">রাজা</option>
+  </select>
+
+  <label for="refAppearance">মূল ছবিতে চরিত্রের চেহারা কেমন?</label>
+  <textarea id="refAppearance" rows="3" placeholder="যেমন: রুপালি চুল, বেগুনি পোশাক, উজ্জ্বল ডানা..." style="display:block;box-sizing:border-box;width:100%;padding:12px;margin:8px 0;"></textarea>
+
+  <label for="refScene">নতুন দৃশ্যের বর্ণনা</label>
+  <textarea id="refScene" rows="3" placeholder="যেমন: পরী লুনা জাদুর বনে উড়ছে..." style="display:block;box-sizing:border-box;width:100%;padding:12px;margin:8px 0;"></textarea>
+
+  <button type="button" onclick="makeReferencePrompt()" style="width:100%;padding:13px;background:#7775ff;color:white;border:0;border-radius:8px;font-weight:bold;">
+    ✨ উন্নত প্রম্পট তৈরি করো
+  </button>
+
+  <textarea id="refPromptResult" rows="8" readonly placeholder="তৈরি হওয়া প্রম্পট এখানে দেখা যাবে..." style="display:block;box-sizing:border-box;width:100%;padding:12px;margin:12px 0;"></textarea>
+
+  <button type="button" onclick="copyReferencePrompt()" style="width:100%;padding:12px;background:#25865b;color:white;border:0;border-radius:8px;">
+    📋 প্রম্পট কপি করো
+  </button>
+  <p id="refPromptStatus"></p>
+</section>
+
+<script>
+function makeReferencePrompt() {
+  const character = document.getElementById("refCharacter").value;
+  const appearance = document.getElementById("refAppearance").value.trim();
+  const scene = document.getElementById("refScene").value.trim();
+  const result = document.getElementById("refPromptResult");
+  const status = document.getElementById("refPromptStatus");
+
+  if (!appearance || !scene) {
+    status.textContent = "চরিত্রের চেহারা এবং দৃশ্যের বর্ণনা দুটোই লেখো।";
+    return;
+  }
+
+  const names = {
+    Maya: "Princess Maya",
+    Luna: "Fairy Luna",
+    King: "The King"
+  };
+
+  result.value =
+    "Create a polished, high-quality 3D animated fairy-tale image. " +
+    "Main character: " + names[character] + ". " +
+    "Character reference description: " + appearance + ". " +
+    "Keep the same face, hairstyle, clothing, colors, body proportions and accessories throughout the story. " +
+    "Scene: " + scene + ". " +
+    "Beautiful composition, clear detailed face, sharp focus, natural anatomy, cinematic lighting, rich colors, 16:9 landscape. " +
+    "No blurry image, no extra fingers, no duplicate characters, no text, no watermark.";
+
+  status.textContent = "প্রম্পট তৈরি হয়েছে। মনে রেখো, এটি শুধু প্রম্পট—রেফারেন্স ছবি AI-তে পাঠায় না।";
+}
+
+function copyReferencePrompt() {
+  const result = document.getElementById("refPromptResult");
+  const status = document.getElementById("refPromptStatus");
+
+  if (!result.value) {
+    status.textContent = "আগে প্রম্পট তৈরি করো।";
+    return;
+  }
+
+  result.focus();
+  result.select();
+
+  try {
+    if (navigator.clipboard && window.isSecureContext) {
+      navigator.clipboard.writeText(result.value)
+        .then(function() {
+          status.textContent = "প্রম্পট কপি হয়েছে!";
+        })
+        .catch(function() {
+          status.textContent = "লেখা নির্বাচন করা হয়েছে। কপি অপশন ব্যবহার করো।";
+        });
+    } else {
+      status.textContent = "লেখা নির্বাচন করা হয়েছে। কপি অপশন ব্যবহার করো।";
+    }
+  } catch (error) {
+    status.textContent = "লেখা নির্বাচন করা হয়েছে। কপি অপশন ব্যবহার করো।";
+  }
+}
+</script>
 </body>
 </html>

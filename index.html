@@ -1,0 +1,180 @@
+
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>My AI Animation Studio</title>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #0b1020;
+      color: white;
+    }
+    header {
+      padding: 22px 16px;
+      text-align: center;
+      background: #151d35;
+      border-bottom: 1px solid #303b59;
+    }
+    header h1 { margin: 0 0 8px; color: #a5b4fc; }
+    header p { color: #cbd5e1; margin: 0; }
+    main { max-width: 760px; margin: auto; padding: 18px; }
+    .panel {
+      background: #151d35;
+      border: 1px solid #303b59;
+      border-radius: 14px;
+      padding: 18px;
+      margin-bottom: 18px;
+    }
+    h2 { font-size: 20px; margin-top: 0; }
+    label { display: block; margin: 14px 0 7px; }
+    textarea, select, input {
+      width: 100%;
+      padding: 12px;
+      border-radius: 9px;
+      border: 1px solid #475569;
+      background: #0b1020;
+      color: white;
+      font-size: 16px;
+    }
+    textarea { min-height: 110px; resize: vertical; }
+    button {
+      padding: 12px 15px;
+      margin-top: 12px;
+      border: 0;
+      border-radius: 9px;
+      background: #6366f1;
+      color: white;
+      font-weight: bold;
+      font-size: 15px;
+      cursor: pointer;
+    }
+    .secondary { background: #334155; }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+    }
+    .tool {
+      background: #202b48;
+      border: 1px solid #384766;
+      border-radius: 12px;
+      padding: 15px 8px;
+      text-align: center;
+    }
+    #output {
+      white-space: pre-wrap;
+      overflow-wrap: anywhere;
+      line-height: 1.6;
+      margin-top: 14px;
+      color: #dbeafe;
+    }
+    .note { color: #94a3b8; font-size: 13px; line-height: 1.5; }
+    @media (max-width: 380px) {
+      .grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>✨ AI Animation Studio</h1>
+    <p>তোমার গল্প, তোমার কল্পনা, তোমার অ্যানিমেশন!</p>
+  </header>
+
+  <main>
+    <section class="panel">
+      <h2>🪄 AI Prompt Maker</h2>
+      <label for="story">তোমার গল্প বা আইডিয়া লেখো</label>
+      <textarea id="story" placeholder="যেমন: একটি রাজকুমারী জাদুর বনে হারিয়ে গেল..."></textarea>
+
+      <label for="style">অ্যানিমেশনের ধরন</label>
+      <select id="style">
+        <option value="2D cartoon animation">2D Cartoon</option>
+        <option value="cinematic 3D animation">3D Animation</option>
+        <option value="storybook illustration">Storybook Art</option>
+      </select>
+
+      <label for="kind">কী তৈরি করতে চাও?</label>
+      <select id="kind">
+        <option value="image">ছবির Prompt</option>
+        <option value="video">ভিডিওর Prompt</option>
+        <option value="story">সম্পূর্ণ গল্পের পরিকল্পনা</option>
+      </select>
+
+      <button onclick="makePrompt()">Prompt তৈরি করো</button>
+      <button class="secondary" onclick="clearAll()">মুছে ফেলো</button>
+
+      <div id="output" aria-live="polite"></div>
+      <button id="copyBtn" class="secondary" hidden onclick="copyPrompt()">Prompt কপি করো</button>
+      <p class="note">এটি প্রথম সংস্করণের Prompt Builder। এটি তোমার লেখা থেকে Prompt সাজায়; নিজে থেকে AI ভিডিও তৈরি করে না।</p>
+    </section>
+
+    <section class="panel">
+      <h2>🎬 তোমার AI Tools</h2>
+      <div class="grid">
+        <div class="tool">📝 Story Maker</div>
+        <div class="tool">🎨 2D Animation</div>
+        <div class="tool">🧊 3D Animation</div>
+        <div class="tool">🎞️ Image to Video</div>
+        <div class="tool">🎙️ AI Voice</div>
+        <div class="tool">✂️ Video Editor</div>
+      </div>
+      <p class="note">এগুলো আপাতত ডেমো বিভাগ। পরবর্তী ধাপে উপযুক্ত AI মডেল যুক্ত করে কার্যকর করার কাজ করব।</p>
+    </section>
+  </main>
+
+  <script>
+    function makePrompt() {
+      const story = document.getElementById("story").value.trim();
+      const style = document.getElementById("style").value;
+      const kind = document.getElementById("kind").value;
+      const output = document.getElementById("output");
+      const copyBtn = document.getElementById("copyBtn");
+
+      if (!story) {
+        output.textContent = "প্রথমে তোমার গল্প বা আইডিয়া লেখো।";
+        copyBtn.hidden = true;
+        return;
+      }
+
+      let task = "Create a detailed image prompt";
+      if (kind === "video") task = "Create a cinematic image-to-video prompt";
+      if (kind === "story") task = "Create a fairy-tale story outline with scene-by-scene descriptions";
+
+      output.textContent =
+        task + " in " + style + " style.\n\n" +
+        "Story idea: " + story + "\n\n" +
+        "Include:\n" +
+        "- Detailed characters and environment\n" +
+        "- Consistent character appearance\n" +
+        "- Appropriate lighting, colors and mood\n" +
+        "- Clear scene composition\n" +
+        (kind === "video"
+          ? "- Natural character motion and camera movement\n- Smooth animation and scene transitions\n"
+          : "") +
+        "- High-quality, family-friendly fantasy visuals";
+
+      copyBtn.hidden = false;
+    }
+
+    async function copyPrompt() {
+      const text = document.getElementById("output").textContent;
+      try {
+        await navigator.clipboard.writeText(text);
+        alert("Prompt কপি হয়েছে!");
+      } catch (e) {
+        alert("Prompt-এর লেখার ওপর চাপ দিয়ে সিলেক্ট করে কপি করো।");
+      }
+    }
+
+    function clearAll() {
+      document.getElementById("story").value = "";
+      document.getElementById("output").textContent = "";
+      document.getElementById("copyBtn").hidden = true;
+    }
+  </script>
+</body>
+</html>

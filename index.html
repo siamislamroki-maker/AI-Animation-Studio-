@@ -348,6 +348,97 @@ function renderCharacters() {
 
 renderCharacters();
 </script>
+<section style="background:#1d2239;color:white;padding:18px;border-radius:14px;margin:20px auto;max-width:760px;font-family:Arial,sans-serif;">
+  <h2 style="color:#c4c0ff;">🖼️ Character Image Library</h2>
+  <p>তোমার তৈরি চরিত্রের ছবি নির্বাচন করে এখানে যোগ করো।</p>
 
+  <label for="characterImageUpload">ফোন থেকে চরিত্রের ছবি বেছে নাও</label>
+  <input id="characterImageUpload" type="file" accept="image/*"
+    style="display:block;width:100%;padding:12px;margin:10px 0;box-sizing:border-box;">
+
+  <label for="characterImageName">চরিত্রের নাম</label>
+  <input id="characterImageName" type="text" placeholder="যেমন: রাজকুমারী মায়া"
+    style="display:block;width:100%;padding:12px;margin:10px 0;box-sizing:border-box;">
+
+  <button type="button" onclick="addCharacterImage()"
+    style="width:100%;padding:13px;background:#7775ff;color:white;border:0;border-radius:8px;font-weight:bold;">
+    💾 ছবিটি যোগ করো
+  </button>
+
+  <p id="characterImageStatus"></p>
+  <div id="characterImageGallery"></div>
+</section>
+
+<script>
+function addCharacterImage() {
+  const fileInput = document.getElementById("characterImageUpload");
+  const nameInput = document.getElementById("characterImageName");
+  const status = document.getElementById("characterImageStatus");
+  const file = fileInput.files[0];
+  const name = nameInput.value.trim();
+
+  if (!file || !name) {
+    status.textContent = "ছবি বেছে নাও এবং চরিত্রের নাম লেখো।";
+    return;
+  }
+
+  if (!file.type.startsWith("image/")) {
+    status.textContent = "একটি ছবির ফাইল নির্বাচন করো।";
+    return;
+  }
+
+  const reader = new FileReader();
+
+  reader.onload = function() {
+    try {
+      const key = "aiAnimationStudioCharacterImages";
+      const images = JSON.parse(localStorage.getItem(key) || "[]");
+      images.push({
+        name: name,
+        image: reader.result
+      });
+      localStorage.setItem(key, JSON.stringify(images));
+      renderCharacterImages();
+      status.textContent = "ছবি সফলভাবে যোগ হয়েছে!";
+      fileInput.value = "";
+      nameInput.value = "";
+    } catch (error) {
+      status.textContent = "ছবিটি সংরক্ষণ করা যায়নি। ছবির ফাইল ছোট করে আবার চেষ্টা করো।";
+    }
+  };
+
+  reader.readAsDataURL(file);
+}
+
+function renderCharacterImages() {
+  const gallery = document.getElementById("characterImageGallery");
+  gallery.replaceChildren();
+
+  let images = [];
+  try {
+    images = JSON.parse(
+      localStorage.getItem("aiAnimationStudioCharacterImages") || "[]"
+    );
+  } catch {}
+
+  images.forEach(function(item) {
+    const card = document.createElement("div");
+    card.style.cssText = "padding:12px;margin:12px 0;background:#101629;border-radius:10px;";
+
+    const title = document.createElement("h3");
+    title.textContent = item.name;
+
+    const img = document.createElement("img");
+    img.src = item.image;
+    img.alt = item.name;
+    img.style.cssText = "width:100%;max-width:320px;border-radius:10px;display:block;";
+
+    card.append(title, img);
+    gallery.append(card);
+  });
+}
+
+renderCharacterImages();
+    </script>
 </body>
 </html>

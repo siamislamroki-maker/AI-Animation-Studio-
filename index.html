@@ -541,5 +541,75 @@ function analyzeStory() {
   output.append(note);
 }
 </script>
+  <section id="storyCharacterImport" style="background:#1d2239;color:white;padding:18px;border-radius:14px;margin:20px auto;max-width:760px;font-family:Arial,sans-serif;">
+  <h2 style="color:#c4c0ff;">👥 গল্প থেকে চরিত্র তৈরি</h2>
+  <p>Story Analyzer-এ বিশ্লেষণ করা গল্পের চরিত্রের নাম এখানে যোগ করো।</p>
+
+  <textarea id="storyCharacterNames" rows="5"
+    placeholder="প্রতি লাইনে একটি চরিত্রের নাম লেখো&#10;রাজকুমারী মায়া&#10;পরী লুনা&#10;রাজা"
+    style="width:100%;padding:12px;box-sizing:border-box;border-radius:8px;"></textarea>
+
+  <button type="button" onclick="prepareStoryCharacters()"
+    style="width:100%;padding:13px;background:#7775ff;color:white;border:0;border-radius:8px;font-weight:bold;">
+    ✨ সব চরিত্র তৈরি করো
+  </button>
+
+  <p id="storyCharacterImportStatus"></p>
+  <div id="storyCharacterImportList"></div>
+</section>
+
+<script>
+function prepareStoryCharacters() {
+  const input = document.getElementById("storyCharacterNames").value;
+  const status = document.getElementById("storyCharacterImportStatus");
+  const list = document.getElementById("storyCharacterImportList");
+
+  const names = [...new Set(
+    input.split(/\n|,/).map(name => name.trim()).filter(Boolean)
+  )];
+
+  if (!names.length) {
+    status.textContent = "আগে চরিত্রগুলোর নাম লেখো।";
+    return;
+  }
+
+  list.replaceChildren();
+
+  names.forEach(name => {
+    const button = document.createElement("button");
+    button.type = "button";
+    button.textContent = "➕ " + name + " — Character Creator-এ যোগ";
+    button.style.cssText =
+      "display:block;width:100%;padding:12px;margin:8px 0;background:#268b76;color:white;border:0;border-radius:8px;";
+
+    button.onclick = function() {
+      const nameField = document.getElementById("charName");
+      const descriptionField = document.getElementById("charDescription");
+      const typeField = document.getElementById("charType");
+
+      if (!nameField || !descriptionField || !typeField) {
+        status.textContent =
+          "Character Creator পাওয়া যায়নি। আগে মূল Character Creator যোগ করতে হবে।";
+        return;
+      }
+
+      nameField.value = name;
+      descriptionField.value = "";
+      typeField.value = "অন্যান্য";
+
+      document.getElementById("characterCreator")
+        .scrollIntoView({ behavior: "smooth", block: "start" });
+
+      status.textContent =
+        name + " নামটি Character Creator-এ পাঠানো হয়েছে। চেহারার বর্ণনা লিখে সংরক্ষণ করো।";
+    };
+
+    list.append(button);
+  });
+
+  status.textContent =
+    names.length + "টি চরিত্র প্রস্তুত। প্রতিটি নামের বাটনে চাপ দিয়ে Character Creator-এ পাঠাও।";
+}
+      </script>
 </body>
 </html>

@@ -440,5 +440,106 @@ function renderCharacterImages() {
 
 renderCharacterImages();
     </script>
+  <section id="storyAnalyzer" style="background:#1d2239;color:white;padding:18px;border-radius:14px;margin:20px auto;max-width:760px;font-family:Arial,sans-serif;">
+  <h2 style="color:#c4c0ff;">📖 Story Analyzer</h2>
+  <p>তোমার গল্প লেখো। আমরা চরিত্র ও দৃশ্যের একটি প্রাথমিক তালিকা তৈরি করব।</p>
+
+  <textarea id="storyText" rows="7" placeholder="যেমন: রাজকুমারী মায়া প্রাসাদ থেকে জাদুর বনে গেল। সেখানে তার দেখা হলো পরী লুনার সঙ্গে। লুনা তাকে একটি জাদুর ফুল দিল।" style="width:100%;padding:12px;box-sizing:border-box;border-radius:8px;"></textarea>
+
+  <button type="button" onclick="analyzeStory()" style="width:100%;padding:13px;margin-top:10px;background:#7775ff;color:white;border:0;border-radius:8px;font-weight:bold;">
+    🔍 গল্প বিশ্লেষণ করো
+  </button>
+
+  <div id="storyResults" style="margin-top:18px;"></div>
+</section>
+
+<script>
+function analyzeStory() {
+  const story = document.getElementById("storyText").value.trim();
+  const output = document.getElementById("storyResults");
+  output.replaceChildren();
+
+  if (!story) {
+    output.textContent = "আগে তোমার গল্প লেখো।";
+    return;
+  }
+
+  const characters = [];
+  const savedCharacters = JSON.parse(
+    localStorage.getItem("aiAnimationStudioCharacters") || "[]"
+  );
+
+  savedCharacters.forEach(function(character) {
+    if (story.includes(character.name) && !characters.includes(character.name)) {
+      characters.push(character.name);
+    }
+  });
+
+  const knownRoles = [
+    "রাজকুমারী", "রাজা", "রানি", "রাজপুত্র",
+    "পরী", "দানব", "জাদুকর", "রাক্ষস"
+  ];
+
+  knownRoles.forEach(function(role) {
+    if (story.includes(role) && !characters.includes(role)) {
+      characters.push(role);
+    }
+  });
+
+  const locationWords = [
+    "প্রাসাদ", "জাদুর বন", "বন", "গ্রাম",
+    "ঝরনা", "গুহা", "রাজ্য", "পাহাড়", "নদী"
+  ];
+
+  const locations = locationWords.filter(function(location) {
+    return story.includes(location);
+  });
+
+  const sentences = story.split(/[।.!?]+/).map(function(s) {
+    return s.trim();
+  }).filter(Boolean);
+
+  function addHeading(text) {
+    const heading = document.createElement("h3");
+    heading.textContent = text;
+    heading.style.color = "#c4c0ff";
+    output.append(heading);
+  }
+
+  function addList(items, emptyMessage) {
+    const list = document.createElement("ul");
+    if (!items.length) {
+      const li = document.createElement("li");
+      li.textContent = emptyMessage;
+      list.append(li);
+    } else {
+      items.forEach(function(item) {
+        const li = document.createElement("li");
+        li.textContent = item;
+        list.append(li);
+      });
+    }
+    output.append(list);
+  }
+
+  addHeading("👥 সম্ভাব্য চরিত্র");
+  addList(characters, "নিশ্চিত চরিত্র পাওয়া যায়নি। গল্পের নাম ও চরিত্রের তথ্য আরও স্পষ্ট করে লেখো।");
+
+  addHeading("📍 সম্ভাব্য স্থান");
+  addList(locations, "পরিচিত কোনো স্থান পাওয়া যায়নি।");
+
+  addHeading("🎬 গল্পের দৃশ্য");
+  const scenes = sentences.slice(0, 30);
+  addList(scenes.map(function(scene, index) {
+    return "Scene " + (index + 1) + ": " + scene;
+  }), "গল্পের দৃশ্য পাওয়া যায়নি।");
+
+  const note = document.createElement("p");
+  note.style.color = "#d0d0e0";
+  note.style.fontSize = "13px";
+  note.textContent = "নোট: এটি প্রাথমিক তালিকা। চরিত্র বা স্থানের নাম গল্পে ভিন্নভাবে লেখা থাকলে কিছু তথ্য বাদ পড়তে পারে।";
+  output.append(note);
+}
+</script>
 </body>
 </html>

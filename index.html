@@ -4,177 +4,216 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>My AI Animation Studio</title>
+  <title>AI Animation Studio</title>
   <style>
     * { box-sizing: border-box; }
     body {
-      margin: 0;
-      font-family: Arial, sans-serif;
-      background: #0b1020;
-      color: white;
+      margin: 0; font-family: Arial, sans-serif;
+      background: #101322; color: white;
     }
     header {
-      padding: 22px 16px;
-      text-align: center;
-      background: #151d35;
-      border-bottom: 1px solid #303b59;
+      padding: 22px 14px; text-align: center;
+      background: #202442; border-bottom: 2px solid #7775ff;
     }
-    header h1 { margin: 0 0 8px; color: #a5b4fc; }
-    header p { color: #cbd5e1; margin: 0; }
-    main { max-width: 760px; margin: auto; padding: 18px; }
-    .panel {
-      background: #151d35;
-      border: 1px solid #303b59;
-      border-radius: 14px;
-      padding: 18px;
-      margin-bottom: 18px;
+    header h1 { margin: 0 0 8px; color: #b8b5ff; }
+    main { max-width: 800px; margin: auto; padding: 16px; }
+    section {
+      background: #1d2239; padding: 18px;
+      border-radius: 14px; margin-bottom: 18px;
     }
-    h2 { font-size: 20px; margin-top: 0; }
-    label { display: block; margin: 14px 0 7px; }
-    textarea, select, input {
-      width: 100%;
-      padding: 12px;
-      border-radius: 9px;
-      border: 1px solid #475569;
-      background: #0b1020;
-      color: white;
+    h2 { color: #c4c0ff; margin-top: 0; }
+    textarea, select, input, button {
+      width: 100%; padding: 12px; margin: 7px 0;
+      border-radius: 9px; border: 1px solid #555b7a;
       font-size: 16px;
     }
-    textarea { min-height: 110px; resize: vertical; }
+    textarea, select, input {
+      background: #101629; color: white;
+    }
     button {
-      padding: 12px 15px;
-      margin-top: 12px;
-      border: 0;
-      border-radius: 9px;
-      background: #6366f1;
-      color: white;
-      font-weight: bold;
-      font-size: 15px;
-      cursor: pointer;
+      background: #7775ff; color: white;
+      font-weight: bold; border: 0; cursor: pointer;
     }
-    .secondary { background: #334155; }
-    .grid {
-      display: grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: 10px;
-    }
-    .tool {
-      background: #202b48;
-      border: 1px solid #384766;
-      border-radius: 12px;
-      padding: 15px 8px;
-      text-align: center;
-    }
-    #output {
-      white-space: pre-wrap;
-      overflow-wrap: anywhere;
-      line-height: 1.6;
-      margin-top: 14px;
-      color: #dbeafe;
-    }
-    .note { color: #94a3b8; font-size: 13px; line-height: 1.5; }
-    @media (max-width: 380px) {
-      .grid { grid-template-columns: 1fr; }
-    }
+    button:disabled { opacity: .55; }
+    #status { white-space: pre-wrap; line-height: 1.6; }
+    #result { width: 100%; border-radius: 12px; margin-top: 12px; }
+    .note { color: #c8cbe0; font-size: 14px; line-height: 1.6; }
   </style>
 </head>
 <body>
-  <header>
-    <h1>✨ AI Animation Studio</h1>
-    <p>তোমার গল্প, তোমার কল্পনা, তোমার অ্যানিমেশন!</p>
-  </header>
+<header>
+  <h1>✨ AI Animation Studio</h1>
+  <p>AI Image Generator & Prompt Maker</p>
+</header>
 
-  <main>
-    <section class="panel">
-      <h2>🪄 AI Prompt Maker</h2>
-      <label for="story">তোমার গল্প বা আইডিয়া লেখো</label>
-      <textarea id="story" placeholder="যেমন: একটি রাজকুমারী জাদুর বনে হারিয়ে গেল..."></textarea>
+<main>
+  <section>
+    <h2>🎨 AI Image Generator</h2>
+    <p class="note">আপনার কল্পনার কথা ইংরেজিতে লিখুন। ফ্রি সার্ভারে অপেক্ষা করতে হতে পারে।</p>
 
-      <label for="style">অ্যানিমেশনের ধরন</label>
-      <select id="style">
-        <option value="2D cartoon animation">2D Cartoon</option>
-        <option value="cinematic 3D animation">3D Animation</option>
-        <option value="storybook illustration">Storybook Art</option>
-      </select>
+    <textarea id="prompt" rows="5"
+      placeholder="A beautiful princess in a magical forest, 3D animated movie style..."></textarea>
 
-      <label for="kind">কী তৈরি করতে চাও?</label>
-      <select id="kind">
-        <option value="image">ছবির Prompt</option>
-        <option value="video">ভিডিওর Prompt</option>
-        <option value="story">সম্পূর্ণ গল্পের পরিকল্পনা</option>
-      </select>
+    <button id="generate" onclick="generateImage()">✨ ছবি তৈরি করুন</button>
+    <p id="status">ছবি তৈরির জন্য প্রস্তুত।</p>
+    <img id="result" alt="আপনার তৈরি AI ছবি" hidden>
+    <a id="download" hidden download="ai-image.png">
+      <button type="button">ছবি ডাউনলোড করুন</button>
+    </a>
+  </section>
 
-      <button onclick="makePrompt()">Prompt তৈরি করো</button>
-      <button class="secondary" onclick="clearAll()">মুছে ফেলো</button>
+  <section>
+    <h2>✍️ AI Prompt Maker</h2>
+    <textarea id="idea" rows="3"
+      placeholder="আপনার গল্প লিখুন, যেমন: রাজকুমারী জাদুর বনে গেল।"></textarea>
+    <select id="style">
+      <option value="cinematic 3D animated movie style">3D Animation</option>
+      <option value="2D cartoon animation style">2D Cartoon</option>
+      <option value="storybook illustration style">Storybook</option>
+    </select>
+    <button onclick="makePrompt()">Prompt তৈরি করুন</button>
+    <textarea id="madePrompt" rows="5" placeholder="আপনার Prompt এখানে আসবে"></textarea>
+    <button onclick="copyPrompt()">Prompt কপি করুন</button>
+  </section>
 
-      <div id="output" aria-live="polite"></div>
-      <button id="copyBtn" class="secondary" hidden onclick="copyPrompt()">Prompt কপি করো</button>
-      <p class="note">এটি প্রথম সংস্করণের Prompt Builder। এটি তোমার লেখা থেকে Prompt সাজায়; নিজে থেকে AI ভিডিও তৈরি করে না।</p>
-    </section>
+  <section>
+    <h2>🎬 অন্যান্য টুল</h2>
+    <p>📖 Story Maker — পরে যুক্ত করা হবে</p>
+    <p>🎞️ 2D Animation — পরে যুক্ত করা হবে</p>
+    <p>🧚 3D Animation — পরে যুক্ত করা হবে</p>
+    <p>🎥 Image to Video — পরে যুক্ত করা হবে</p>
+    <p>🎙️ AI Voice — পরে যুক্ত করা হবে</p>
+    <p>✂️ Video Editor — পরে যুক্ত করা হবে</p>
+  </section>
+</main>
 
-    <section class="panel">
-      <h2>🎬 তোমার AI Tools</h2>
-      <div class="grid">
-        <div class="tool">📝 Story Maker</div>
-        <div class="tool">🎨 2D Animation</div>
-        <div class="tool">🧊 3D Animation</div>
-        <div class="tool">🎞️ Image to Video</div>
-        <div class="tool">🎙️ AI Voice</div>
-        <div class="tool">✂️ Video Editor</div>
-      </div>
-      <p class="note">এগুলো আপাতত ডেমো বিভাগ। পরবর্তী ধাপে উপযুক্ত AI মডেল যুক্ত করে কার্যকর করার কাজ করব।</p>
-    </section>
-  </main>
+<script>
+function makePrompt() {
+  const idea = document.getElementById("idea").value.trim();
+  const style = document.getElementById("style").value;
+  if (!idea) {
+    alert("আগে আপনার গল্প লিখুন।");
+    return;
+  }
+  document.getElementById("madePrompt").value =
+    idea + ", " + style +
+    ", detailed characters, beautiful lighting, vibrant colors, fantasy environment, family-friendly, high quality.";
+}
 
-  <script>
-    function makePrompt() {
-      const story = document.getElementById("story").value.trim();
-      const style = document.getElementById("style").value;
-      const kind = document.getElementById("kind").value;
-      const output = document.getElementById("output");
-      const copyBtn = document.getElementById("copyBtn");
+async function copyPrompt() {
+  const text = document.getElementById("madePrompt").value;
+  if (!text) return alert("আগে Prompt তৈরি করুন।");
+  try {
+    await navigator.clipboard.writeText(text);
+    alert("Prompt কপি হয়েছে!");
+  } catch {
+    alert("Prompt সিলেক্ট করে কপি করুন।");
+  }
+}
 
-      if (!story) {
-        output.textContent = "প্রথমে তোমার গল্প বা আইডিয়া লেখো।";
-        copyBtn.hidden = true;
-        return;
+async function generateImage() {
+  const prompt = document.getElementById("prompt").value.trim();
+  const button = document.getElementById("generate");
+  const status = document.getElementById("status");
+  const result = document.getElementById("result");
+  const download = document.getElementById("download");
+
+  if (!prompt) {
+    alert("আগে ছবির বর্ণনা লিখুন।");
+    return;
+  }
+
+  button.disabled = true;
+  result.hidden = true;
+  download.hidden = true;
+  status.textContent = "ছবির অনুরোধ পাঠানো হচ্ছে...";
+
+  try {
+    const response = await fetch("https://aihorde.net/api/v2/generate/async", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "apikey": "0000000000",
+        "Client-Agent": "AI-Animation-Studio:1.0"
+      },
+      body: JSON.stringify({
+        prompt: prompt,
+        params: {
+          sampler_name: "k_euler",
+          steps: 20,
+          width: 512,
+          height: 512,
+          cfg_scale: 7,
+          n: 1
+        },
+        nsfw: false,
+        censor_nsfw: true,
+        r2: true,
+        shared: false
+      })
+    });
+
+    if (!response.ok) {
+      throw new Error("সার্ভার অনুরোধ গ্রহণ করেনি (" + response.status + ")।");
+    }
+
+    const data = await response.json();
+    if (!data.id) throw new Error("কাজের ID পাওয়া যায়নি।");
+
+    status.textContent = "কাজের অনুরোধ গৃহীত হয়েছে। ছবি তৈরি হচ্ছে... অপেক্ষা করুন।";
+
+    let finished = false;
+    for (let i = 0; i < 120; i++) {
+      await new Promise(resolve => setTimeout(resolve, 5000));
+
+      const checkResponse = await fetch(
+        "https://aihorde.net/api/v2/generate/check/" + data.id,
+        { headers: { "Client-Agent": "AI-Animation-Studio:1.0" } }
+      );
+      if (!checkResponse.ok) throw new Error("কাজের অবস্থা দেখা যাচ্ছে না।");
+
+      const check = await checkResponse.json();
+      status.textContent = "ছবি তৈরি হচ্ছে... " +
+        (check.waiting || 0) + "টি কাজ অপেক্ষায়, " +
+        (check.processing || 0) + "টি কাজ চলছে।";
+
+      if (check.faulted) throw new Error("ফ্রি সার্ভারে সমস্যা হয়েছে। আবার চেষ্টা করুন।");
+
+      if (check.done) {
+        const finalResponse = await fetch(
+          "https://aihorde.net/api/v2/generate/status/" + data.id,
+          { headers: { "Client-Agent": "AI-Animation-Studio:1.0" } }
+        );
+        if (!finalResponse.ok) throw new Error("তৈরি হওয়া ছবির তথ্য পাওয়া যায়নি।");
+
+        const finalData = await finalResponse.json();
+        const imageUrl = finalData.generations &&
+                         finalData.generations[0] &&
+                         finalData.generations[0].img;
+
+        if (!imageUrl) throw new Error("ছবির লিংক পাওয়া যায়নি।");
+
+        result.src = imageUrl.startsWith("http")
+          ? imageUrl : "data:image/png;base64," + imageUrl;
+        result.hidden = false;
+        download.href = result.src;
+        download.hidden = false;
+        status.textContent = "✅ ছবি তৈরি হয়েছে!";
+        finished = true;
+        break;
       }
-
-      let task = "Create a detailed image prompt";
-      if (kind === "video") task = "Create a cinematic image-to-video prompt";
-      if (kind === "story") task = "Create a fairy-tale story outline with scene-by-scene descriptions";
-
-      output.textContent =
-        task + " in " + style + " style.\n\n" +
-        "Story idea: " + story + "\n\n" +
-        "Include:\n" +
-        "- Detailed characters and environment\n" +
-        "- Consistent character appearance\n" +
-        "- Appropriate lighting, colors and mood\n" +
-        "- Clear scene composition\n" +
-        (kind === "video"
-          ? "- Natural character motion and camera movement\n- Smooth animation and scene transitions\n"
-          : "") +
-        "- High-quality, family-friendly fantasy visuals";
-
-      copyBtn.hidden = false;
     }
 
-    async function copyPrompt() {
-      const text = document.getElementById("output").textContent;
-      try {
-        await navigator.clipboard.writeText(text);
-        alert("Prompt কপি হয়েছে!");
-      } catch (e) {
-        alert("Prompt-এর লেখার ওপর চাপ দিয়ে সিলেক্ট করে কপি করো।");
-      }
+    if (!finished) {
+      status.textContent = "অনেকক্ষণ অপেক্ষা হয়েছে। পরে আবার চেষ্টা করুন।";
     }
-
-    function clearAll() {
-      document.getElementById("story").value = "";
-      document.getElementById("output").textContent = "";
-      document.getElementById("copyBtn").hidden = true;
-    }
-  </script>
+  } catch (error) {
+    status.textContent = "সমস্যা হয়েছে: " + error.message +
+      "\nফ্রি সার্ভার ব্যস্ত থাকতে পারে। কিছুক্ষণ পরে আবার চেষ্টা করুন।";
+  } finally {
+    button.disabled = false;
+  }
+}
+</script>
 </body>
 </html>

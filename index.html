@@ -795,5 +795,145 @@ function copyScenePrompt() {
   }
 }
 </script>
+  <section id="sceneImageLibrary" style="background:#1d2239;color:white;padding:18px;border-radius:14px;margin:20px auto;max-width:760px;font-family:Arial,sans-serif;">
+  <h2 style="color:#c4c0ff;">🎞️ Scene Image Library</h2>
+  <p>গল্পের দৃশ্যের ছবি আলাদাভাবে সংরক্ষণ করো।</p>
+
+  <label for="librarySceneName">দৃশ্যের নাম</label>
+  <input id="librarySceneName" type="text" placeholder="যেমন: Scene 1 - জাদুর বন"
+    style="display:block;box-sizing:border-box;width:100%;padding:12px;margin:8px 0;">
+
+  <label for="libraryCharacter">এই দৃশ্যে কোন চরিত্র আছে?</label>
+  <select id="libraryCharacter" style="display:block;width:100%;padding:12px;margin:8px 0;">
+    <option>রাজকুমারী মায়া</option>
+    <option>পরী লুনা</option>
+    <option>রাজা</option>
+    <option>একাধিক চরিত্র</option>
+  </select>
+
+  <label for="librarySceneImage">দৃশ্যের ছবি নির্বাচন করো</label>
+  <input id="librarySceneImage" type="file" accept="image/*"
+    style="display:block;width:100%;padding:12px;margin:8px 0;">
+
+  <button type="button" onclick="saveSceneLibraryImage()"
+    style="width:100%;padding:13px;background:#7775ff;color:white;border:0;border-radius:8px;font-weight:bold;">
+    💾 দৃশ্যের ছবি সংরক্ষণ
+  </button>
+
+  <p id="sceneLibraryStatus"></p>
+  <div id="sceneLibraryGallery"></div>
+</section>
+
+<script>
+function saveSceneLibraryImage() {
+  const name = document.getElementById("librarySceneName").value.trim();
+  const character = document.getElementById("libraryCharacter").value;
+  const file = document.getElementById("librarySceneImage").files[0];
+  const status = document.getElementById("sceneLibraryStatus");
+
+  if (!name || !file) {
+    status.textContent = "দৃশ্যের নাম লেখো এবং একটি ছবি নির্বাচন করো।";
+    return;
+  }
+
+  if (!file.type.startsWith("image/")) {
+    status.textContent = "একটি ছবির ফাইল নির্বাচন করো।";
+    return;
+  }
+
+  if (file.size > 1024 * 1024) {
+    status.textContent = "ছবিটি 1 MB-এর চেয়ে বড়। ছোট ছবি বেছে নাও।";
+    return;
+  }
+
+  const reader = new FileReader();
+
+  reader.onload = function() {
+    try {
+      const key = "aiAnimationStudioSceneLibrary";
+      const scenes = JSON.parse(localStorage.getItem(key) || "[]");
+
+      scenes.push({
+        id: Date.now(),
+        name: name,
+        character: character,
+        image: reader.result
+      });
+
+      localStorage.setItem(key, JSON.stringify(scenes));
+      document.getElementById("librarySceneName").value = "";
+      document.getElementById("librarySceneImage").value = "";
+      status.textContent = "দৃশ্যের ছবি সংরক্ষণ হয়েছে!";
+      renderSceneLibrary();
+    } catch (error) {
+      status.textContent = "সংরক্ষণ করা যায়নি। ব্রাউজারের স্টোরেজে জায়গা কম থাকতে পারে।";
+    }
+  };
+
+  reader.onerror = function() {
+    status.textContent = "ছবি পড়তে সমস্যা হয়েছে। আবার চেষ্টা করো।";
+  };
+
+  reader.readAsDataURL(file);
+}
+
+function renderSceneLibrary() {
+  const gallery = document.getElementById("sceneLibraryGallery");
+  gallery.replaceChildren();
+
+  let scenes = [];
+  try {
+    scenes = JSON.parse(
+      localStorage.getItem("aiAnimationStudioSceneLibrary") || "[]"
+    );
+  } catch {
+    return;
+  }
+
+  scenes.slice().reverse().forEach(function(scene) {
+    const card = document.createElement("div");
+    card.style.cssText = "background:#101629;padding:12px;margin:12px 0;border-radius:10px;";
+
+    const title = document.createElement("h3");
+    title.textContent = scene.name;
+
+    const label = document.createElement("p");
+    label.textContent = "চরিত্র: " + scene.character;
+
+    const img = document.createElement("img");
+    img.src = scene.image;
+    img.alt = scene.name;
+    img.style.cssText = "width:100%;max-width:320px;border-radius:10px;display:block;";
+
+    const remove = document.createElement("button");
+    remove.type = "button";
+    remove.textContent = "🗑️ এই ছবি মুছুন";
+    remove.style.cssText = "margin-top:10px;padding:10px;background:#a33;color:white;border:0;border-radius:8px;";
+    remove.onclick = function() {
+      if (!confirm("এই দৃশ্যের ছবিটি মুছতে চাও?")) return;
+      try {
+        const current = JSON.parse(
+          localStorage.getItem("aiAnimationStudioSceneLibrary") || "[]"
+        );
+        localStorage.setItem(
+          "aiAnimationStudioSceneLibrary",
+          JSON.stringify(current.filter(function(item) {
+            return item.id !== scene.id;
+          }))
+        );
+        renderSceneLibrary();
+      } catch {
+        document.getElementById("sceneLibraryStatus").textContent =
+          "ছবি মুছতে সমস্যা হয়েছে।";
+      }
+    };
+
+    card.append(title, label, img, remove);
+    gallery.append(card);
+  });
+}
+
+renderSceneLibrary();
+    </script>
 </body>
 </html>

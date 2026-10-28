@@ -712,5 +712,88 @@ function renderManagerGallery() {
 
 renderManagerGallery();
 </script>
+  <section id="scenePromptGenerator" style="background:#1d2239;color:white;padding:18px;border-radius:14px;margin:20px auto;max-width:760px;font-family:Arial,sans-serif;">
+  <h2 style="color:#c4c0ff;">🎬 Scene Image Prompt Generator</h2>
+  <p>গল্পের প্রতিটি দৃশ্যের জন্য ছবির প্রম্পট তৈরি করো।</p>
+
+  <label for="sceneNumber">দৃশ্য নির্বাচন করো</label>
+  <select id="sceneNumber" style="display:block;width:100%;padding:12px;margin:8px 0;">
+    <option value="1">Scene 1 — রাজকুমারী মায়া</option>
+    <option value="2">Scene 2 — পরী লুনা</option>
+    <option value="3">Scene 3 — জাদুর ফুল</option>
+    <option value="4">Scene 4 — রাজার প্রাসাদ</option>
+  </select>
+
+  <label for="sceneAction">দৃশ্যে কী ঘটবে?</label>
+  <textarea id="sceneAction" rows="3" placeholder="এখানে দৃশ্যের বর্ণনা লেখো..." style="display:block;width:100%;box-sizing:border-box;padding:12px;margin:8px 0;"></textarea>
+
+  <button type="button" onclick="generateScenePrompt()" style="width:100%;padding:13px;background:#7775ff;color:white;border:0;border-radius:8px;font-weight:bold;">
+    ✨ ছবির প্রম্পট তৈরি করো
+  </button>
+
+  <textarea id="scenePromptOutput" rows="7" readonly placeholder="তোমার ছবির প্রম্পট এখানে আসবে..." style="display:block;width:100%;box-sizing:border-box;padding:12px;margin:12px 0;"></textarea>
+
+  <button type="button" onclick="copyScenePrompt()" style="width:100%;padding:12px;background:#25865b;color:white;border:0;border-radius:8px;">
+    📋 প্রম্পট কপি করো
+  </button>
+
+  <p id="scenePromptStatus"></p>
+</section>
+
+<script>
+function generateScenePrompt() {
+  const number = document.getElementById("sceneNumber").value;
+  const action = document.getElementById("sceneAction").value.trim();
+  const output = document.getElementById("scenePromptOutput");
+  const status = document.getElementById("scenePromptStatus");
+
+  if (!action) {
+    status.textContent = "আগে দৃশ্যের বর্ণনা লেখো।";
+    return;
+  }
+
+  const characters = {
+    "1": "Princess Maya, same character design, long black hair, pink royal gown and jeweled crown",
+    "2": "Fairy Luna, same character design, silver hair, purple fairy dress, glowing magical wings and wand",
+    "3": "Princess Maya and Fairy Luna, keep both character designs consistent; a glowing magical flower",
+    "4": "Princess Maya, Fairy Luna and the King; the King has white hair, a white beard, a golden crown and a red royal robe"
+  };
+
+  output.value =
+    "Create a beautiful 3D animated fairy-tale scene. " +
+    "Characters: " + characters[number] + ". " +
+    "Scene action: " + action + ". " +
+    "Keep character appearance consistent with the saved reference images. " +
+    "Detailed expressions, cinematic lighting, colorful fantasy environment, high quality, 16:9 landscape, no text, no watermark.";
+
+  status.textContent = "প্রম্পট তৈরি হয়েছে! এবার কপি করতে পারো।";
+}
+
+function copyScenePrompt() {
+  const output = document.getElementById("scenePromptOutput");
+  const status = document.getElementById("scenePromptStatus");
+
+  if (!output.value) {
+    status.textContent = "আগে ছবির প্রম্পট তৈরি করো।";
+    return;
+  }
+
+  if (navigator.clipboard && window.isSecureContext) {
+    navigator.clipboard.writeText(output.value)
+      .then(function() {
+        status.textContent = "প্রম্পট কপি হয়েছে!";
+      })
+      .catch(function() {
+        output.focus();
+        output.select();
+        status.textContent = "প্রম্পট নির্বাচন করা হয়েছে। কপি অপশন ব্যবহার করো।";
+      });
+  } else {
+    output.focus();
+    output.select();
+    status.textContent = "প্রম্পট নির্বাচন করা হয়েছে। কপি অপশন ব্যবহার করো।";
+  }
+}
+</script>
 </body>
 </html>
